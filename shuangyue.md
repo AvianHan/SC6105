@@ -5,9 +5,3 @@ npm install next react react-dom express cors hardhat @nomicfoundation/hardhat-t
 
 
 npm install
-
-npm run dev:frontend
-
-npm run dev:backend
-
-npm run dev:contracts
