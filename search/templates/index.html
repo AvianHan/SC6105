@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>论文搜索</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .search-container {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    input {
+      width: 300px;
+      padding: 10px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .result-item {
+      background-color: #fff;
+      padding: 15px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .no-results {
+      text-align: center;
+      color: #999;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>论文搜索</h1>
+  <div class="search-container">
+    <input type="text" id="search" placeholder="输入标题、关键词或摘要">
+    <button onclick="searchPapers()">搜索</button>
+  </div>
+  <div class="results" id="results"></div>
+
+  <script>
+    async function searchPapers() {
+      const query = document.getElementById('search').value.trim();
+      const resultsContainer = document.getElementById('results');
+
+      if (!query) {
+        resultsContainer.innerHTML = '<div class="no-results">请输入搜索关键词</div>';
+        return;
+      }
+
+      // 显示正在搜索
+      resultsContainer.innerHTML = '<div class="no-results">正在搜索...</div>';
+
+      try {
+        const response = await fetch(`/search?query=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // 清空结果容器
+        resultsContainer.innerHTML = '';
+
+        if (!data.results || data.results.length === 0) {
+          // 如果没有结果，显示提示
+          resultsContainer.innerHTML = '<div class="no-results">未找到相关论文</div>';
+        } else {
+          // 显示搜索结果
+          data.results.forEach((paper) => {
+            const item = document.createElement('div');
+            item.className = 'result-item';
+            item.innerHTML = `
+              <h3>${paper.title}</h3>
+              <p><strong>作者:</strong> ${paper.authors}</p>
+              <p><strong>摘要:</strong> ${paper.abstract}</p>
+              <p><strong>关键字:</strong> ${paper.keywords}</p>
+              <small><strong>时间:</strong> ${paper.timestamp}</small>
+            `;
+            resultsContainer.appendChild(item);
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        resultsContainer.innerHTML = '<div class="no-results">发生错误，请稍后重试。</div>';
+      }
+    }
+  </script>
+</body>
+</html>
