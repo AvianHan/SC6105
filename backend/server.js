@@ -1,54 +1,36 @@
-// backend/server.js
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');
 
-const { testPinataConnection, uploadFileToPinata } = require('./pinata');
-const { submitPaperToContract } = require('./contract');
+const { testPinataConnection } = require('./pinata');
+const authRoutes = require('./routes/auth');
+const paperRoutes = require('./routes/paper');
+const searchRoutes = require('./routes/search');
 
 const app = express();
-app.use(cors());
+
+
+app.use(cors({
+  origin: 'http://localhost:3001',  // 前端地址 (3001端口)
+  credentials: true,
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// 添加解析 JSON 请求体的中间件
+app.use(express.json());
+// 添加解析 URL-encoded 请求体的中间件
+app.use(express.urlencoded({ extended: true }));
 
 testPinataConnection();
 
-// 处理文件上传的配置 (内存存储)
-const upload = multer({ storage: multer.memoryStorage() });
+// 注册路由
+app.use('/auth', authRoutes);
+app.use('/paper', paperRoutes);
+app.use('/search', searchRoutes);
 
-// 这个接口仅做测试: 看后端是否在跑
-app.get('/', (req, res) => {
-  res.send('Backend server is running...');
-});
-
-
-app.post('/SubmitPaper', upload.single('paper'), async (req, res) => {
-    try {
-      // 如果前端的 <input name="paper" ...> 就可以用 req.file 获取到文件
-      if (!req.file) {
-        return res.status(400).json({ success: false, message: 'No file uploaded' });
-      }
-  
-      // 1. 上传到 Pinata, 得到 CID
-      const fileBuffer = req.file.buffer;
-      const originalName = req.file.originalname || 'paper';
-      const cid = await uploadFileToPinata(fileBuffer, originalName);
-  
-      // 2. 调用合约 submitPaper
-      const txHash = await submitPaperToContract(cid);
-      console.log("Contract txHash:", txHash);
-  
-      // 返回给前端
-      res.json({ success: true, cid, txHash });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, message: 'Upload failed', error });
-    }
-});
-
-
-// 启动后端监听
-const PORT = 3001; // 也可以从环境变量读取
+// 启动后端监听在 3000 端口
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });

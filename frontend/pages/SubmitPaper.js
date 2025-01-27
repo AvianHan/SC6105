@@ -23,7 +23,7 @@ export default function PdfUploadPage() {
 
     try {
       // 这里写后端接口的地址
-      const response = await fetch('http://localhost:3001/SubmitPaper', {
+      const response = await fetch('http://localhost:3000/paper/submit', {
         method: 'POST',
         body: formData
       });
