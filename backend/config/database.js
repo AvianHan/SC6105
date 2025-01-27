@@ -16,25 +16,7 @@ const pool = mysql.createPool({
   try {
     const connection = await pool.getConnection();
     console.log('Successfully connected to MySQL database');
-    
-    // 测试 Accounts 表是否存在
-    const [tables] = await connection.query('SHOW TABLES LIKE "Accounts"');
-    if (tables.length === 0) {
-      console.log('Creating Accounts table...');
-      await connection.query(`
-        CREATE TABLE IF NOT EXISTS Accounts (
-          account_id VARCHAR(255) PRIMARY KEY,
-          password VARCHAR(255) NOT NULL,
-          nickname VARCHAR(255),
-          reviewer BOOLEAN DEFAULT false,
-          author BOOLEAN DEFAULT false
-        )
-      `);
-      console.log('Accounts table created successfully');
-    } else {
-      console.log('Accounts table already exists');
-    }
-    
+
     connection.release();
   } catch (err) {
     console.error('Failed to connect to MySQL:', err);

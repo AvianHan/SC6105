@@ -23,7 +23,7 @@ export default function Login() {
   
       const data = await res.json();
       localStorage.setItem('token', data.token);
-      router.push('/dashboard');
+      router.push('SubmitPaper');
     } catch (error) {
       console.error('登录失败:', error.message);
     }
