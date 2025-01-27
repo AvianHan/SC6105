@@ -1,6 +1,7 @@
 // frontend/pages/search.js
 import { useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 
 export default function Search() {
   const [query, setQuery] = useState('');
@@ -99,6 +100,9 @@ export default function Search() {
       `}</style>
 
       <h1>论文搜索</h1>
+      <p><Link href="/SubmitPaper">Go to Upload Page</Link></p>
+      <p><Link href="/login">Go to Login Page</Link></p>
+      <p><Link href="/register">Go to Register Page</Link></p>
       
       <div className="search-container">
         <input

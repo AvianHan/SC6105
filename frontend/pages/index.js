@@ -1,13 +1,13 @@
-import Link from 'next/link';
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Home() {
-  return (
-    <div>
-      <h1>Welcome to My Project</h1>
-      
-      <p><Link href="/search">论文搜索</Link></p>
-      <p><Link href="/SubmitPaper">Go to Upload Page</Link></p>
-      <p><Link href="/login">Go to Login Page</Link></p>
-    </div>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/search');
+  }, []);  // 空依赖数组意味着这个效果只会在组件挂载时运行一次
+
+  // 在重定向发生之前返回一个加载状态或空内容
+  return null;
 }
