@@ -24,3 +24,14 @@ npm install
 mysqld --skip-grant-tables
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 
+
+CREATE TABLE IF NOT EXISTS paper_reviewers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  paper_id INTEGER,
+  reviewer_id INTEGER,
+  status TEXT,        -- invited / submitted / 等等
+  content TEXT,       -- 存放审稿意见、评分等
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+

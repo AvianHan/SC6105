@@ -1,3 +1,5 @@
+// backend/controllers/searchController.js
+
 const Paper = require('../models/paper');
 
 exports.searchPapers = async (req, res) => {
