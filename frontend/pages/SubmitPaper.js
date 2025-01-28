@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '../styles/Form.module.css';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Upload, File, X } from 'lucide-react';
 import Select from 'react-select';
 
 export default function PdfUploadPage() {
@@ -11,6 +11,7 @@ export default function PdfUploadPage() {
   const [result, setResult] = useState({ cid: '', txHash: '' });
   const [error, setError] = useState('');
   const [selectedKeywords, setSelectedKeywords] = useState([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   const keywordOptions = [
     { value: '3D Reconstruction', label: '3D Reconstruction' },
@@ -37,28 +38,61 @@ export default function PdfUploadPage() {
   };
 
   const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      setSelectedFile(file);
+      setError('');
+    } else {
+      setError('Please select a PDF file');
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'application/pdf') {
+      setSelectedFile(file);
+      setError('');
+    } else {
+      setError('Please drop a PDF file');
+    }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
     setError('');
   };
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      setError('请先选择一个文件');
+      setError('please select a file to upload');
       return;
     }
 
     if (!title.trim()) {
-      setError('请输入论文标题');
+      setError('please enter the title');
       return;
     }
 
     if (!abstract.trim()) {
-      setError('请输入论文摘要');
+      setError('please enter the abstract');
       return;
     }
 
     if (selectedKeywords.length === 0) {
-      setError('请至少选择一个关键词');
+      setError('please select at least one keyword');
       return;
     }
 
@@ -78,17 +112,16 @@ export default function PdfUploadPage() {
       if (response.ok) {
         setResult({ cid: data.cid, txHash: data.txHash || '' });
         setError('');
-        // 清空表单
         setTitle('');
         setAbstract('');
         setSelectedKeywords([]);
         setSelectedFile(null);
       } else {
-        setError(data.message || '上传失败');
+        setError(data.message || 'Failed to upload file, please try again');
       }
     } catch (error) {
       console.error(error);
-      setError('文件上传出错，请重试');
+      setError('Failed to upload file, please try again');
     }
   };
 
@@ -98,51 +131,89 @@ export default function PdfUploadPage() {
         <ArrowLeft size={24} />
       </Link>
 
-      <h1 className={styles.title}>论文上传</h1>
+      <h1 className={styles.title}>Upload your paper</h1>
 
       <div className={styles.form}>
         <div className={styles.inputGroup}>
-          <label htmlFor="title">论文标题</label>
+          <label htmlFor="title">Paper's title</label>
           <input
             id="title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className={styles.textInput}
-            placeholder="请输入论文标题"
+            placeholder="please enter the title"
           />
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="abstract">论文摘要</label>
+          <label htmlFor="abstract">Paper's abstract</label>
           <textarea
             id="abstract"
             value={abstract}
             onChange={(e) => setAbstract(e.target.value)}
             className={styles.textArea}
-            placeholder="请输入论文摘要"
+            placeholder="please enter the abstract"
             rows={5}
           />
         </div>
 
-        <div className={styles.fileInput}>
-          <label>上传PDF文件</label>
-          <input 
-            type="file" 
-            onChange={handleFileChange}
-            accept=".pdf"
-          />
+        <div className={styles.inputGroup}>
+          <label>Upload PDF</label>
+          <div
+            className={`${styles.fileDropzone} ${isDragging ? styles.dragging : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            {!selectedFile ? (
+              <div className={styles.uploadPrompt}>
+                <Upload className={styles.uploadIcon} />
+                <p>
+                  Drag and drop your PDF here, or
+                  <label className={styles.browseLabel}>
+                    <span className={styles.browseText}> browse</span>
+                    <input
+                      type="file"
+                      onChange={handleFileChange}
+                      accept=".pdf"
+                      className={styles.hiddenInput}
+                    />
+                  </label>
+                </p>
+                <p className={styles.fileHint}>PDF files only, up to 10MB</p>
+              </div>
+            ) : (
+              <div className={styles.selectedFile}>
+                <div className={styles.fileInfo}>
+                  <File className={styles.fileIcon} />
+                  <div>
+                    <p className={styles.fileName}>{selectedFile.name}</p>
+                    <p className={styles.fileSize}>
+                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={removeFile}
+                  className={styles.removeButton}
+                >
+                  <X />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className={styles.inputGroup}>
-          <label>关键词</label>
+          <label>Keywords</label>
           <Select
             isMulti
             name="keywords"
             options={keywordOptions}
             value={selectedKeywords}
             onChange={handleKeywordsChange}
-            placeholder="选择关键词（可多选）"
+            placeholder="please select keywords"
             className={styles.selectContainer}
             classNamePrefix="select"
           />
@@ -152,7 +223,7 @@ export default function PdfUploadPage() {
           onClick={handleUpload} 
           className={styles.button}
         >
-          上传论文
+          Upload your paper
         </button>
 
         {error && (
@@ -162,7 +233,7 @@ export default function PdfUploadPage() {
         {result.cid && (
           <div className={styles.resultContainer}>
             <div className={styles.resultItem}>
-              <span className={styles.resultLabel}>CID:</span>
+              <span className={styles.resultLabel}>DID:</span>
               {result.cid}
             </div>
             {result.txHash && (

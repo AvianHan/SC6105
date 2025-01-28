@@ -39,8 +39,8 @@ export default function Login() {
       }));
       router.push('/SubmitPaper');
     } catch (error) {
-      setError('登录失败: ' + error.message);
-      console.error('登录失败:', error.message);
+      setError('login failed: ' + error.message);
+      console.error('login failed:', error.message);
     }
   };
 
@@ -50,26 +50,26 @@ export default function Login() {
         <ArrowLeft size={24} />
       </Link>
       
-      <h1 className={styles.title}>登录</h1>
+      <h1 className={styles.title}>Login</h1>
       
       <form onSubmit={handleLogin} className={styles.form}>
         <input
           type="text"
-          placeholder="账号"
+          placeholder="account"
           className={styles.input}
           value={credentials.accountId}
           onChange={(e) => setCredentials({...credentials, accountId: e.target.value})}
         />
         <input
           type="password"
-          placeholder="密码"
+          placeholder="password"
           className={styles.input}
           value={credentials.password}
           onChange={(e) => setCredentials({...credentials, password: e.target.value})}
         />
         {error && <div className={styles.errorMessage}>{error}</div>}
         <button type="submit" className={styles.button}>
-          登录
+          Login
         </button>
       </form>
     </div>

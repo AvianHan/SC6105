@@ -192,3 +192,102 @@
 .select__option--is-focused {
   background-color: rgba(74, 144, 226, 0.1) !important;
 }
+
+/* 在 Form.module.css 文件末尾添加以下样式 */
+
+.fileDropzone {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+}
+
+.fileDropzone.dragging {
+  border-color: #4a90e2;
+  background-color: rgba(74, 144, 226, 0.1);
+}
+
+.uploadPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.uploadIcon {
+  width: 40px;
+  height: 40px;
+  color: #999;
+  margin-bottom: 8px;
+}
+
+.browseLabel {
+  cursor: pointer;
+}
+
+.browseText {
+  color: #4a90e2;
+  text-decoration: underline;
+}
+
+.fileHint {
+  color: #666;
+  font-size: 14px;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.selectedFile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.fileInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fileIcon {
+  width: 24px;
+  height: 24px;
+  color: #4a90e2;
+}
+
+.fileName {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.fileSize {
+  font-size: 12px;
+  color: #666;
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  color: #666;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.removeButton:hover {
+  background-color: #eee;
+  color: #333;
+}

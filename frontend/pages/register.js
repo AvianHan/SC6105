@@ -49,7 +49,7 @@ export default function Register() {
     setError('');
 
     if (formData.reviewer && formData.fields.length === 0) {
-      setError('评审者必须选择至少一个领域');
+      setError('Reviewer must select at least one field');
       return;
     }
 
@@ -69,11 +69,11 @@ export default function Register() {
         router.push('/login');
       } else {
         const errorData = await res.json();
-        setError(errorData.message || '注册失败');
+        setError(errorData.message || 'Register failed, please try again');
       }
     } catch (error) {
-      setError('注册失败，请重试');
-      console.error('注册失败:', error);
+      setError('Register failed, please try again');
+      console.error('Register failed', error);
     }
   };
 
@@ -83,13 +83,13 @@ export default function Register() {
         <ArrowLeft size={24} />
       </Link>
 
-      <h1 className={styles.title}>注册</h1>
+      <h1 className={styles.title}>Register</h1>
       
       <form onSubmit={handleRegister} className={styles.form}>
         <div className={styles.inputGroup}>
           <input
             type="text"
-            placeholder="账号"
+            placeholder="Account ID"
             className={styles.input}
             onChange={(e) => setFormData({...formData, accountId: e.target.value})}
           />
@@ -98,7 +98,7 @@ export default function Register() {
         <div className={styles.inputGroup}>
           <input
             type="password"
-            placeholder="密码"
+            placeholder="Password"
             className={styles.input}
             onChange={(e) => setFormData({...formData, password: e.target.value})}
           />
@@ -107,7 +107,7 @@ export default function Register() {
         <div className={styles.inputGroup}>
           <input
             type="text"
-            placeholder="昵称"
+            placeholder="Nickname"
             className={styles.input}
             onChange={(e) => setFormData({...formData, nickname: e.target.value})}
           />
@@ -121,7 +121,7 @@ export default function Register() {
               checked={formData.reviewer}
               onChange={(e) => setFormData({...formData, reviewer: e.target.checked})}
             />
-            评审者
+            Reviewer
           </label>
         </div>
         
@@ -133,13 +133,13 @@ export default function Register() {
               checked={formData.author}
               onChange={(e) => setFormData({...formData, author: e.target.checked})}
             />
-            作者
+            Author
           </label>
         </div>
 
         {formData.reviewer && (
           <div className={styles.inputGroup}>
-            <label>选择领域</label>
+            <label>Select your field</label>
             <Select
               isMulti
               name="fields"
@@ -148,7 +148,7 @@ export default function Register() {
                 formData.fields.includes(option.value)
               )}
               onChange={handleFieldChange}
-              placeholder="选择领域（可多选）"
+              placeholder="Please select your field"
               className={styles.selectContainer}
               classNamePrefix="select"
             />
@@ -157,7 +157,7 @@ export default function Register() {
 
         {error && <div className={styles.errorMessage}>{error}</div>}
         <button type="submit" className={styles.button}>
-          注册
+          Register
         </button>
       </form>
     </div>
