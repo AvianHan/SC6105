@@ -1,14 +1,13 @@
-// frontend/pages/index.js
-export default function HomePage() {
-  // 即使渲染到客户端，这里也不会显示，因为服务器端会先跳转
-  return <div>Redirecting...</div>;
-}
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
-export async function getServerSideProps() {
-  return {
-    redirect: {
-      destination: '/search',
-      permanent: false,
-    },
-  };
+export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/search');
+  }, []);  // 空依赖数组意味着这个效果只会在组件挂载时运行一次
+
+  // 在重定向发生之前返回一个加载状态或空内容
+  return null;
 }

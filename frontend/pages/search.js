@@ -1,30 +1,54 @@
-// frontend/pages/search.js
-import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import styles from '../styles/Search.module.css';
 
 export default function Search() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [message, setMessage] = useState('');
+  const [recommendedPapers, setRecommendedPapers] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
+  useEffect(() => {
+    fetchRecommendedPapers();
+  }, []);
+
+  async function fetchRecommendedPapers() {
+    try {
+      const response = await fetch('http://localhost:3000/search/recommended');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setRecommendedPapers(data.results);
+    } catch (error) {
+      console.error('Error fetching recommended papers:', error);
+    }
+  }
 
   async function searchPapers() {
     const trimmedQuery = query.trim();
+    
     if (!trimmedQuery) {
-      setMessage('请输入搜索关键词');
+      setMessage('please enter keyword to search');
       setResults([]);
       return;
     }
 
-    setMessage('正在搜索...');
+    setMessage('Searching...');
+    setShowSearchResults(true);
+
     try {
       const response = await fetch(`http://localhost:3000/search?query=${encodeURIComponent(trimmedQuery)}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
+
       if (!data.results || data.results.length === 0) {
-        setMessage('未找到相关论文');
+        setMessage('No results found');
         setResults([]);
       } else {
         setMessage('');
@@ -32,7 +56,7 @@ export default function Search() {
       }
     } catch (error) {
       console.error('Error:', error);
-      setMessage('发生错误，请稍后重试。');
+      setMessage('Failed to search papers, please try again later');
       setResults([]);
     }
   }
@@ -40,47 +64,55 @@ export default function Search() {
   return (
     <>
       <Head>
-        <title>论文搜索</title>
+        <title>Dexiv</title>
       </Head>
 
-      <h1>论文搜索</h1>
+      <h1 className={styles.title}>Dexiv</h1>
       <p><Link href="/SubmitPaper">Go to Upload Page</Link></p>
       <p><Link href="/login">Go to Login Page</Link></p>
       <p><Link href="/register">Go to Register Page</Link></p>
       
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+      <div className={styles.searchContainer}>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="输入标题、关键词或摘要"
-          style={{ width: 300, padding: 10, marginRight: 10, border: '1px solid #ccc', borderRadius: 5 }}
+          placeholder="Enter keyword to search"
+          className={styles.input}
         />
-        <button
-          onClick={searchPapers}
-          style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: 5 }}
-        >
-          搜索
-        </button>
+        <button onClick={searchPapers} className={styles.button}>Search</button>
       </div>
 
-      <div style={{ marginTop: 20 }}>
-        {message && (
-          <div style={{ textAlign: 'center', color: '#999', marginTop: 20 }}>
-            {message}
-          </div>
-        )}
-        
-        {results.map((paper, index) => (
-          <div key={index} style={{ backgroundColor: '#fff', padding: 15, marginBottom: 10, border: '1px solid #ddd', borderRadius: 5 }}>
-            <h3>{paper.title}</h3>
-            <p><strong>作者:</strong> {paper.authors}</p>
-            <p><strong>摘要:</strong> {paper.abstract}</p>
-            <p><strong>关键字:</strong> {paper.keywords}</p>
-            <small><strong>时间:</strong> {paper.timestamp}</small>
-          </div>
-        ))}
-      </div>
+      {showSearchResults ? (
+        <div className={styles.results}>
+          {message && (
+            <div className={styles.noResults}>{message}</div>
+          )}
+          
+          {results.map((paper, index) => (
+            <div key={index} className={styles.resultItem}>
+              <h3>{paper.title}</h3>
+              <p><strong>Author:</strong> {paper.authors}</p>
+              <p><strong>Abstract:</strong> {paper.abstract}</p>
+              <p><strong>Keywords:</strong> {paper.keywords}</p>
+              <small><strong>Time:</strong> {paper.timestamp}</small>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className={styles.recommendedPapers}>
+          <h2 className={styles.recommendedTitle}>Recommended Papers</h2>
+          {recommendedPapers.map((paper, index) => (
+            <div key={index} className={styles.resultItem}>
+              <h3>{paper.title}</h3>
+              <p><strong>Authors:</strong> {paper.authors}</p>
+              <p><strong>Abstract:</strong> {paper.abstract}</p>
+              <p><strong>Keywords:</strong> {paper.keywords}</p>
+              <small><strong>Time:</strong> {paper.timestamp}</small>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   );
 }

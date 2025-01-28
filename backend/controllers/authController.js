@@ -39,8 +39,14 @@ exports.login = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const { accountId, password, nickname, reviewer, author } = req.body;
-    await Account.create(accountId, password, nickname, reviewer, author);
+    const { accountId, password, nickname, reviewer, author, field } = req.body;
+    
+    // 添加验证：如果是reviewer必须有field
+    if (reviewer && !field) {
+      return res.status(400).json({ error: '评审者必须选择领域' });
+    }
+
+    await Account.create(accountId, password, nickname, reviewer, author, field);
     res.status(201).json({ message: '注册成功' });
   } catch (err) {
     if (err.code === 'ER_DUP_ENTRY') {

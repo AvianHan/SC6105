@@ -20,16 +20,16 @@ class Account {
     }
   }
 
-  static async create(accountId, password, nickname, reviewer, author) {
+  static async create(accountId, password, nickname, reviewer, author,field) {
     try {
       const db = await dbPromise;
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // 使用 run() 执行 INSERT/UPDATE/DELETE
       await db.run(
-        `INSERT INTO account (account_id, password, nickname, reviewer, author)
-         VALUES (?, ?, ?, ?, ?)`,
-        [accountId, hashedPassword, nickname, reviewer, author]
+        `INSERT INTO account (account_id, password, nickname, reviewer, author, field)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [accountId, hashedPassword, nickname, reviewer, author, field]
       );
     } catch (error) {
       console.error('Error in create:', error);
