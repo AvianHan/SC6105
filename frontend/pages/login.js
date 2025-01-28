@@ -28,8 +28,16 @@ export default function Login() {
       }
   
       const data = await res.json();
+      // 存储认证信息和用户信息
       localStorage.setItem('token', data.token);
-      router.push('SubmitPaper');
+      localStorage.setItem('userInfo', JSON.stringify({
+        accountId: data.user.account_id,
+        nickname: data.user.nickname,
+        reviewer: data.user.reviewer,
+        author: data.user.author,
+        field: data.user.field
+      }));
+      router.push('/SubmitPaper');
     } catch (error) {
       setError('登录失败: ' + error.message);
       console.error('登录失败:', error.message);
@@ -49,16 +57,18 @@ export default function Login() {
           type="text"
           placeholder="账号"
           className={styles.input}
+          value={credentials.accountId}
           onChange={(e) => setCredentials({...credentials, accountId: e.target.value})}
         />
         <input
           type="password"
           placeholder="密码"
           className={styles.input}
+          value={credentials.password}
           onChange={(e) => setCredentials({...credentials, password: e.target.value})}
         />
         {error && <div className={styles.errorMessage}>{error}</div>}
-        <button className={styles.button}>
+        <button type="submit" className={styles.button}>
           登录
         </button>
       </form>

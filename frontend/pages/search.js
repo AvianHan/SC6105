@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import styles from '../styles/Search.module.css';
 
@@ -68,9 +67,6 @@ export default function Search() {
       </Head>
 
       <h1 className={styles.title}>Dexiv</h1>
-      <p><Link href="/SubmitPaper">Go to Upload Page</Link></p>
-      <p><Link href="/login">Go to Login Page</Link></p>
-      <p><Link href="/register">Go to Register Page</Link></p>
       
       <div className={styles.searchContainer}>
         <input
