@@ -1,0 +1,23 @@
+/* frontend/styles/globals.css */
+
+/* Reset some defaults */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Basic body style */
+body {
+  background: #f4f4f4;
+  font-family: Arial, sans-serif;
+}
+
+/* Basic link style */
+a {
+  color: #0070f3;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}

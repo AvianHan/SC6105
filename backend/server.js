@@ -1,3 +1,5 @@
+// backend/server.js
+
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -6,6 +8,8 @@ const { testPinataConnection } = require('./pinata');
 const authRoutes = require('./routes/auth');
 const paperRoutes = require('./routes/paper');
 const searchRoutes = require('./routes/search');
+const reviewRoutes = require('./routes/review');
+
 
 const app = express();
 
@@ -28,6 +32,7 @@ testPinataConnection();
 app.use('/auth', authRoutes);
 app.use('/paper', paperRoutes);
 app.use('/search', searchRoutes);
+app.use('/review', reviewRoutes);
 
 // 启动后端监听在 3000 端口
 const PORT = 3000;

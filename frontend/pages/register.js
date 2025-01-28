@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// frontend/pages/register.js
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Register() {
@@ -35,26 +36,26 @@ export default function Register() {
           type="text"
           placeholder="账号"
           className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setFormData({...formData, accountId: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
         />
         <input
           type="password"
           placeholder="密码"
           className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setFormData({...formData, password: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
         />
         <input
           type="text"
           placeholder="昵称"
           className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setFormData({...formData, nickname: e.target.value})}
+          onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
         />
         <div className="mb-4">
           <label className="flex items-center">
             <input
               type="checkbox"
               className="mr-2"
-              onChange={(e) => setFormData({...formData, reviewer: e.target.checked})}
+              onChange={(e) => setFormData({ ...formData, reviewer: e.target.checked })}
             />
             评审者
           </label>
@@ -64,7 +65,7 @@ export default function Register() {
             <input
               type="checkbox"
               className="mr-2"
-              onChange={(e) => setFormData({...formData, author: e.target.checked})}
+              onChange={(e) => setFormData({ ...formData, author: e.target.checked })}
             />
             作者
           </label>

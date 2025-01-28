@@ -1,4 +1,5 @@
-import { useState } from 'react';
+// frontend/pages/login.js
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Login() {
@@ -10,20 +11,16 @@ export default function Login() {
     try {
       const res = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
       });
-  
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.error); // 改为error.error获取具体错误信息
+        throw new Error(error.error);
       }
-  
       const data = await res.json();
       localStorage.setItem('token', data.token);
-      router.push('SubmitPaper');
+      router.push('/SubmitPaper');
     } catch (error) {
       console.error('登录失败:', error.message);
     }
@@ -37,13 +34,13 @@ export default function Login() {
           type="text"
           placeholder="账号"
           className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setCredentials({...credentials, accountId: e.target.value})}
+          onChange={(e) => setCredentials({ ...credentials, accountId: e.target.value })}
         />
         <input
           type="password"
           placeholder="密码"
           className="w-full p-2 mb-4 border rounded"
-          onChange={(e) => setCredentials({...credentials, password: e.target.value})}
+          onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
         />
         <button className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
           登录

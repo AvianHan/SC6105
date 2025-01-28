@@ -1,12 +1,19 @@
 // backend/routes/review.js
-
 const express = require('express');
 const router = express.Router();
-const paperController = require('../controllers/reviewController');
 
-// 已有的一些router.xxxx()
+const reviewController = require('../controllers/reviewController');
 
-router.post('/inviteReviewer', reviewController.inviteReviewer);
-router.post('/submitReview', reviewController.submitReview);
+// 发起邀请
+router.post('/invite', reviewController.inviteReview);
+
+// 评审回应(接受/拒绝)
+router.post('/respond', reviewController.respondInvitation);
+
+// 提交评审意见
+router.post('/submit', reviewController.submitReview);
+
+// 获取我被邀请的论文（可带status参数）
+router.get('/myInvitations', reviewController.getMyInvitations);
 
 module.exports = router;

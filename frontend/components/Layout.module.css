@@ -1,0 +1,100 @@
+/* frontend/components/Layout.module.css */
+.layoutContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: #fff;
+  border-bottom: 1px solid #ccc;
+  height: 60px;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.navTabs a {
+  margin-right: 20px;
+  text-decoration: none;
+  color: #333;
+}
+
+.navTabs a:hover {
+  text-decoration: underline;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+.searchForm {
+  display: flex;
+  margin-right: 20px;
+}
+
+.searchForm input {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+}
+
+.searchForm button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.userMenu {
+  position: relative;
+  cursor: pointer;
+}
+
+.userName {
+  padding: 5px 10px;
+  background: #eee;
+  border-radius: 4px;
+}
+
+.dropdown {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  width: 140px;
+  z-index: 999;
+}
+
+.dropdown a,
+.dropdown .dropdownItem {
+  display: block;
+  padding: 8px;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown a:hover,
+.dropdown .dropdownItem:hover {
+  background: #f0f0f0;
+}
+
+.dropdownDivider {
+  height: 1px;
+  background: #ccc;
+  margin: 4px 0;
+}
+
+.mainContent {
+  flex: 1;
+  padding: 20px;
+  background: #f9f9f9;
+  overflow: auto;
+}
