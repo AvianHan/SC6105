@@ -20,3 +20,7 @@ npm install next react react-dom express cors hardhat @nomicfoundation/hardhat-t
 
 
 npm install
+
+mysqld --skip-grant-tables
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
+
