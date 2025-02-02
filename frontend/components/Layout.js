@@ -1,4 +1,3 @@
-// frontend/components/Layout.js
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -11,11 +10,11 @@ export default function Layout({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // 检查登录状态和用户信息
+  // 检查登录状态的函数
+  const checkLoginStatus = () => {
     const token = localStorage.getItem('token');
     const storedUserInfo = localStorage.getItem('userInfo');
-    
+
     if (token && storedUserInfo) {
       try {
         const parsedUserInfo = JSON.parse(storedUserInfo);
@@ -23,9 +22,38 @@ export default function Layout({ children }) {
         setUserInfo(parsedUserInfo);
       } catch (error) {
         console.error('Failed to parse user info:', error);
-        handleSignOut(); // 如果用户信息损坏，执行登出
+        handleSignOut();
       }
+    } else {
+      setIsLoggedIn(false);
+      setUserInfo(null);
     }
+  };
+
+  useEffect(() => {
+    // 初始检查登录状态
+    checkLoginStatus();
+
+    // 添加登录状态变化的事件监听器
+    const handleLoginStateChange = () => {
+      checkLoginStatus();
+    };
+
+    // 添加存储变化的事件监听器
+    const handleStorageChange = (e) => {
+      if (e.key === 'token' || e.key === 'userInfo') {
+        checkLoginStatus();
+      }
+    };
+
+    window.addEventListener('loginStateChange', handleLoginStateChange);
+    window.addEventListener('storage', handleStorageChange);
+
+    // 清理事件监听器
+    return () => {
+      window.removeEventListener('loginStateChange', handleLoginStateChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleSearch = (e) => {
@@ -78,9 +106,10 @@ export default function Layout({ children }) {
                     {userInfo?.reviewer && (
                       <Link href="/myReviews" className={styles.dropdownItem}>Peer Review</Link>
                     )}
-                    {userInfo?.author && (
+                    {/* 修改这部分条件渲染的写法 当不是作者时不显示My Papers选项*/}
+                    {userInfo?.author ? (
                       <Link href="/profile" className={styles.dropdownItem}>My Papers</Link>
-                    )}
+                    ) : null}
                     <div className={styles.dropdownDivider} />
                     <Link href="/profile" className={styles.dropdownItem}>Account Settings</Link>
                     <div className={styles.dropdownDivider} />
