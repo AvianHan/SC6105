@@ -7,12 +7,12 @@ import { ArrowLeft } from 'lucide-react';
 export default function Login() {
   const [credentials, setCredentials] = useState({ accountId: '', password: '' });
   const [error, setError] = useState('');
-  const router = useRouter();
+  const router = useRouter(); // 我们将直接使用 router 进行重定向，不再需要 isSuccess 状态
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-    
+
     try {
       const res = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
@@ -21,12 +21,12 @@ export default function Login() {
         },
         body: JSON.stringify(credentials)
       });
-  
+
       if (!res.ok) {
         const error = await res.json();
         throw new Error(error.error);
       }
-  
+
       const data = await res.json();
       // 存储认证信息和用户信息
       localStorage.setItem('token', data.token);
@@ -37,10 +37,16 @@ export default function Login() {
         author: data.user.author,
         field: data.user.field
       }));
-      router.push('/SubmitPaper');
+
+      // 触发 Layout 更新
+      window.dispatchEvent(new Event('loginStateChange'));
+
+      // 直接重定向到搜索页面，这将触发页面刷新
+      router.push('/search');
+      
     } catch (error) {
-      setError('login failed: ' + error.message);
-      console.error('login failed:', error.message);
+      setError('Login failed: ' + error.message);
+      console.error('Login failed:', error.message);
     }
   };
 
@@ -49,20 +55,20 @@ export default function Login() {
       <Link href="/search" className={styles.backButton}>
         <ArrowLeft size={24} />
       </Link>
-      
+
       <h1 className={styles.title}>Login</h1>
-      
+
       <form onSubmit={handleLogin} className={styles.form}>
         <input
           type="text"
-          placeholder="account"
+          placeholder="Account"
           className={styles.input}
           value={credentials.accountId}
           onChange={(e) => setCredentials({...credentials, accountId: e.target.value})}
         />
         <input
           type="password"
-          placeholder="password"
+          placeholder="Password"
           className={styles.input}
           value={credentials.password}
           onChange={(e) => setCredentials({...credentials, password: e.target.value})}
