@@ -102,11 +102,15 @@ export default function Layout({ children }) {
                 <Link href="/search" className={styles.dropdownItem}>Home</Link>
                 {isLoggedIn ? (
                   <>
-                    <Link href="/SubmitPaper" className={styles.dropdownItem}>Upload Paper</Link>
-                    {userInfo?.reviewer && (
+                    {/*当不是作者时不显示Upload Paper选项*/}
+                    {userInfo?.author ? (
+                      <Link href="/SubmitPaper" className={styles.dropdownItem}>Upload Paper</Link>
+                    ) : null}
+                    {/*当不是审稿人时不显示Peer Review选项*/}
+                    {userInfo?.reviewer ? (
                       <Link href="/myReviews" className={styles.dropdownItem}>Peer Review</Link>
-                    )}
-                    {/* 修改这部分条件渲染的写法 当不是作者时不显示My Papers选项*/}
+                    ) : null}
+                    {/*当不是作者时不显示My Papers选项*/}
                     {userInfo?.author ? (
                       <Link href="/profile" className={styles.dropdownItem}>My Papers</Link>
                     ) : null}
