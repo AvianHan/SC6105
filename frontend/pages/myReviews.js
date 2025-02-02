@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 export default function MyReviews() {
   const [invitations, setInvitations] = useState([]);
   const [acceptedPapers, setAcceptedPapers] = useState([]);
-  const [reviewContent, setReviewContent] = useState('');
+  const [reviewContent, setReviewContent] = useState({});
 
   // 假设当前登录reviewer ID = 99
   const reviewerId = 99;
@@ -15,9 +15,11 @@ export default function MyReviews() {
       .then(data => {
         if (data.success) {
           setInvitations(data.invitations);
+        } else {
+          console.error('Failed to fetch invitations:', data.message);
         }
       })
-      .catch(err => console.error(err));
+      .catch(err => console.error('Network error:', err));
   }, []);
 
   useEffect(() => {
@@ -26,9 +28,11 @@ export default function MyReviews() {
       .then(data => {
         if (data.success) {
           setAcceptedPapers(data.invitations);
+        } else {
+          console.error('Failed to fetch accepted papers:', data.message);
         }
       })
-      .catch(err => console.error(err));
+      .catch(err => console.error('Network error:', err));
   }, []);
 
   const handleRespond = async (paperId, accept) => {
@@ -46,7 +50,7 @@ export default function MyReviews() {
         alert(data.message || '操作失败');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error responding to invitation:', error);
       alert('网络错误');
     }
   };
@@ -59,19 +63,19 @@ export default function MyReviews() {
         body: JSON.stringify({
           paper_id: paperId,
           reviewer_id: reviewerId,
-          review_content: reviewContent
+          review_content: reviewContent[paperId] || ''
         })
       });
       const data = await res.json();
       if (data.success) {
         alert('提交成功');
         setAcceptedPapers(acceptedPapers.filter(a => a.paper_id !== paperId));
-        setReviewContent('');
+        setReviewContent(prev => ({ ...prev, [paperId]: '' }));
       } else {
         alert(data.message || '提交失败');
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error submitting review:', error);
       alert('网络错误');
     }
   };
@@ -83,7 +87,7 @@ export default function MyReviews() {
       <section>
         <h2>被邀请的论文 (status = invited)</h2>
         {invitations.map(inv => (
-          <div key={inv.id} style={{ border: '1px solid #ddd', margin: 10, padding: 10 }}>
+          <div key={inv.paper_id} style={{ border: '1px solid #ddd', margin: 10, padding: 10 }}>
             <p>Paper Title: {inv.paper_title}</p>
             <p>Status: {inv.status}</p>
             <button onClick={() => handleRespond(inv.paper_id, true)}>接受邀请</button>
@@ -95,14 +99,14 @@ export default function MyReviews() {
       <section style={{ marginTop: 40 }}>
         <h2>待我评审的论文 (status = accepted)</h2>
         {acceptedPapers.map(inv => (
-          <div key={inv.id} style={{ border: '1px solid #ddd', margin: 10, padding: 10 }}>
+          <div key={inv.paper_id} style={{ border: '1px solid #ddd', margin: 10, padding: 10 }}>
             <p>Paper Title: {inv.paper_title}</p>
             <p>Status: {inv.status}</p>
             <div>
               <textarea
                 placeholder="在此填写评审意见"
-                value={reviewContent}
-                onChange={e => setReviewContent(e.target.value)}
+                value={reviewContent[inv.paper_id] || ''}
+                onChange={e => setReviewContent(prev => ({ ...prev, [inv.paper_id]: e.target.value }))}
                 rows={4}
                 cols={50}
               />
