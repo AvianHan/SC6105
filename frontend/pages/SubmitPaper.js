@@ -1,3 +1,5 @@
+// frontend/pages/SubmitPaper.js
+
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '../styles/Form.module.css';
@@ -13,24 +15,14 @@ export default function PdfUploadPage() {
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Example keyword list (you can adjust or fetch from backend)
   const keywordOptions = [
-    { value: '3D Reconstruction', label: '3D Reconstruction' },
-    { value: 'AI History', label: 'AI History' },
-    { value: 'AI Optimization', label: 'AI Optimization' },
-    { value: 'AI Planning', label: 'AI Planning' },
-    { value: 'Algorithms', label: 'Algorithms' },
-    { value: 'Analysis', label: 'Analysis' },
     { value: 'Artificial Intelligence', label: 'Artificial Intelligence' },
-    { value: 'Computer Vision', label: 'Computer Vision' },
-    { value: 'Data Science', label: 'Data Science' },
-    { value: 'Deep Learning', label: 'Deep Learning' },
     { value: 'Machine Learning', label: 'Machine Learning' },
-    { value: 'Natural Language Processing', label: 'Natural Language Processing' },
-    { value: 'Neural Networks', label: 'Neural Networks' },
+    { value: 'Deep Learning', label: 'Deep Learning' },
+    { value: 'Computer Vision', label: 'Computer Vision' },
     { value: 'NLP', label: 'NLP' },
-    { value: 'Optimization', label: 'Optimization' },
-    { value: 'Robotics', label: 'Robotics' },
-    { value: 'Transformers', label: 'Transformers' }
+    // ... add more as needed
   ];
 
   const handleKeywordsChange = (selectedOptions) => {
@@ -60,7 +52,6 @@ export default function PdfUploadPage() {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    
     const file = e.dataTransfer.files[0];
     if (file && file.type === 'application/pdf') {
       setSelectedFile(file);
@@ -75,26 +66,38 @@ export default function PdfUploadPage() {
     setError('');
   };
 
+  /**
+   * Key part: also include "author_id" in FormData
+   */
   const handleUpload = async () => {
     if (!selectedFile) {
-      setError('please select a file to upload');
+      setError('Please select a PDF file to upload');
       return;
     }
 
     if (!title.trim()) {
-      setError('please enter the title');
+      setError('Please enter the paper title');
       return;
     }
 
     if (!abstract.trim()) {
-      setError('please enter the abstract');
+      setError('Please enter the paper abstract');
       return;
     }
 
     if (selectedKeywords.length === 0) {
-      setError('please select at least one keyword');
+      setError('Please select at least one keyword');
       return;
     }
+
+    // get current user's author_id
+    const storedUserInfo = localStorage.getItem('userInfo');
+    if (!storedUserInfo) {
+      setError('You are not logged in');
+      return;
+    }
+    const user = JSON.parse(storedUserInfo);
+    const authorId = user.accountId;
 
     const formData = new FormData();
     formData.append('paper', selectedFile);
@@ -102,13 +105,16 @@ export default function PdfUploadPage() {
     formData.append('abstract', abstract);
     formData.append('keywords', JSON.stringify(selectedKeywords.map(k => k.value)));
 
+    // crucial: pass author_id to backend
+    formData.append('author_id', authorId);
+
     try {
       const response = await fetch('http://localhost:3000/paper/submit', {
         method: 'POST',
         body: formData
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         setResult({ cid: data.cid, txHash: data.txHash || '' });
         setError('');
@@ -119,8 +125,8 @@ export default function PdfUploadPage() {
       } else {
         setError(data.message || 'Failed to upload file, please try again');
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setError('Failed to upload file, please try again');
     }
   };
@@ -131,29 +137,29 @@ export default function PdfUploadPage() {
         <ArrowLeft size={24} />
       </Link>
 
-      <h1 className={styles.title}>Upload your paper</h1>
+      <h1 className={styles.title}>Upload Your Paper</h1>
 
       <div className={styles.form}>
         <div className={styles.inputGroup}>
-          <label htmlFor="title">Paper's title</label>
+          <label htmlFor="title">Paper Title</label>
           <input
             id="title"
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className={styles.textInput}
-            placeholder="please enter the title"
+            placeholder="Enter the title"
           />
         </div>
 
         <div className={styles.inputGroup}>
-          <label htmlFor="abstract">Paper's abstract</label>
+          <label htmlFor="abstract">Paper Abstract</label>
           <textarea
             id="abstract"
             value={abstract}
             onChange={(e) => setAbstract(e.target.value)}
             className={styles.textArea}
-            placeholder="please enter the abstract"
+            placeholder="Enter the abstract"
             rows={5}
           />
         </div>
@@ -213,7 +219,7 @@ export default function PdfUploadPage() {
             options={keywordOptions}
             value={selectedKeywords}
             onChange={handleKeywordsChange}
-            placeholder="please select keywords"
+            placeholder="Select keywords"
             className={styles.selectContainer}
             classNamePrefix="select"
           />
@@ -223,7 +229,7 @@ export default function PdfUploadPage() {
           onClick={handleUpload} 
           className={styles.button}
         >
-          Upload your paper
+          Upload Your Paper
         </button>
 
         {error && (

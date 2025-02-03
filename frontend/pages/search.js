@@ -1,3 +1,4 @@
+// frontend/pages/search.js
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import styles from '../styles/Search.module.css';
@@ -20,7 +21,7 @@ export default function Search() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setRecommendedPapers(data.results);
+      setRecommendedPapers(data.results || []);
     } catch (error) {
       console.error('Error fetching recommended papers:', error);
     }
@@ -28,9 +29,8 @@ export default function Search() {
 
   async function searchPapers() {
     const trimmedQuery = query.trim();
-    
     if (!trimmedQuery) {
-      setMessage('please enter keyword to search');
+      setMessage('Please enter a keyword to search');
       setResults([]);
       return;
     }
@@ -45,7 +45,6 @@ export default function Search() {
       }
 
       const data = await response.json();
-
       if (!data.results || data.results.length === 0) {
         setMessage('No results found');
         setResults([]);
@@ -58,6 +57,14 @@ export default function Search() {
       setMessage('Failed to search papers, please try again later');
       setResults([]);
     }
+  }
+
+  function formatReviewStatus(reviewStatuses) {
+    if (!reviewStatuses) return 'No reviewers yet';
+    const statuses = reviewStatuses.split(',').map(s => s.trim());
+    if (statuses.includes('submitted')) return 'At least one reviewer has submitted';
+    if (statuses.includes('accepted') || statuses.includes('invited')) return `In review (${reviewStatuses})`;
+    return reviewStatuses;
   }
 
   return (
@@ -88,10 +95,20 @@ export default function Search() {
           {results.map((paper, index) => (
             <div key={index} className={styles.resultItem}>
               <h3>{paper.title}</h3>
-              <p><strong>Author:</strong> {paper.authors}</p>
+              <p><strong>Authors:</strong> {paper.authors}</p>
               <p><strong>Abstract:</strong> {paper.abstract}</p>
               <p><strong>Keywords:</strong> {paper.keywords}</p>
+              <p><strong>Review Status:</strong> {formatReviewStatus(paper.reviewStatuses)}</p>
               <small><strong>Time:</strong> {paper.timestamp}</small>
+              <br />
+              <a 
+                href={`https://gateway.pinata.cloud/ipfs/${paper.DID}`} 
+                target="_blank" 
+                rel="noreferrer"
+                className={styles.viewLink}
+              >
+                View PDF
+              </a>
             </div>
           ))}
         </div>
@@ -104,7 +121,17 @@ export default function Search() {
               <p><strong>Authors:</strong> {paper.authors}</p>
               <p><strong>Abstract:</strong> {paper.abstract}</p>
               <p><strong>Keywords:</strong> {paper.keywords}</p>
+              <p><strong>Review Status:</strong> {formatReviewStatus(paper.reviewStatuses)}</p>
               <small><strong>Time:</strong> {paper.timestamp}</small>
+              <br />
+              <a 
+                href={`https://gateway.pinata.cloud/ipfs/${paper.DID}`} 
+                target="_blank" 
+                rel="noreferrer"
+                className={styles.viewLink}
+              >
+                View PDF
+              </a>
             </div>
           ))}
         </div>

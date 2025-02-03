@@ -13,6 +13,9 @@ npm run deploy:contracts
 npm run dev:all
 
 
+88888888
+
+
 npx hardhat clean
 
 npm init -y

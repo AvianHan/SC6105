@@ -3,56 +3,58 @@
 const reviewModel = require('../models/reviewModel');
 
 /**
- * 邀请评审
- * 示例：
- *   1) 获取paper的keywords
- *   2) 找到所有reviewer=1的用户 (可在后续根据paper_keywords和reviewer.field做匹配)
- *   3) 在 paper_reviewers 表里插入记录 status='invited'
+ * 给 paperDID 邀请匹配到的评审(自动调用)
+ * paperKeywords 是传进来的数组，如 ["Artificial Intelligence", "Deep Learning"]
  */
-exports.inviteReview = async (req, res) => {
+exports.autoInviteReviewers = async (paperDID, paperKeywords) => {
   try {
-    const { paper_id } = req.body;
-    if (!paper_id) {
-      return res.status(400).json({ success: false, message: 'paper_id required' });
-    }
-
-    // 1) 获取paper信息
-    const paper = await reviewModel.getPaperById(paper_id);
-    if (!paper) {
-      return res.status(404).json({ success: false, message: 'Paper not found' });
-    }
-    // 取出paper的keywords
-    const paperKeywords = paper.keywords ? paper.keywords.split(',').map(s => s.trim()) : [];
-
-    // 2) 获取所有具备reviewer=1的账户
+    // 1) 找到所有 reviewer=1
     const reviewers = await reviewModel.getAllReviewers();
 
-    // 3) 如果你想只邀请“领域匹配”的人，则筛选一下
+    // 2) 做关键词匹配
+    //   若需要所有人都收到，可直接 matchedReviewers = reviewers;
     const matchedReviewers = reviewers.filter(r => {
       if (!r.field) return false;
+      // 只要paper里任意keyword在r.field字段字符串中出现，就视为匹配
       return paperKeywords.some(kw => r.field.includes(kw));
     });
 
     let invitedCount = 0;
     for (let r of matchedReviewers) {
-      // 看是否已有记录
-      const exist = await reviewModel.getPaperReviewer(paper_id, r.id);
+      // 检查是否已邀请过
+      const exist = await reviewModel.getPaperReviewer(paperDID, r.id);
       if (!exist) {
-        await reviewModel.insertPaperReviewer(paper_id, r.id, 'invited');
+        await reviewModel.insertPaperReviewer(paperDID, r.id, 'invited');
         invitedCount++;
       }
     }
-
-    return res.json({ success: true, message: 'Invite success', invitedCount });
+    console.log(`autoInviteReviewers: paperDID=${paperDID}, invitedCount=${invitedCount}`);
+    return invitedCount;
   } catch (error) {
-    console.error('[inviteReview error]', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    console.error('[autoInviteReviewers error]', error);
+    return 0; // 出错就邀请0人
   }
 };
 
+/**
+ * 手动发起邀请(可不再用, 留下以备需要)
+ */
+exports.inviteReview = async (req, res) => {
+  try {
+    const { paper_id } = req.body; // 这里paper_id= DID
+    if (!paper_id) {
+      return res.status(400).json({ success: false, message: 'paper_id required' });
+    }
+
+    // 这里也可以参考 autoInviteReviewers 的逻辑
+    // ...
+  } catch (error) {
+    // ...
+  }
+};
 
 /**
- * 接受 or 拒绝 评审邀请
+ * 接受 or 拒绝
  */
 exports.respondInvitation = async (req, res) => {
   try {
@@ -61,7 +63,6 @@ exports.respondInvitation = async (req, res) => {
       return res.status(400).json({ success: false, message: 'paper_id and reviewer_id required' });
     }
 
-    // 先看是否存在
     const record = await reviewModel.getPaperReviewer(paper_id, reviewer_id);
     if (!record) {
       return res.status(404).json({ success: false, message: 'No invite record found' });
@@ -76,7 +77,6 @@ exports.respondInvitation = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
-
 
 /**
  * 提交评审
@@ -105,15 +105,14 @@ exports.submitReview = async (req, res) => {
   }
 };
 
-
 /**
  * 获取(列出)某个reviewer被邀请的论文列表
- *   可选：仅列出 invited / accepted / submitted
+ * ?reviewer_id=xxx&status=invited/accepted
  */
 exports.getMyInvitations = async (req, res) => {
   try {
     const reviewerId = req.query.reviewer_id;
-    const status = req.query.status || 'invited'; // 默认查询invited
+    const status = req.query.status || 'invited';
     if (!reviewerId) {
       return res.status(400).json({ success: false, message: 'reviewer_id required' });
     }

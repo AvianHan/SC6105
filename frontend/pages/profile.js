@@ -1,52 +1,67 @@
 // frontend/pages/profile.js
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 export default function Profile() {
+  const router = useRouter();
+
+  const [authorId, setAuthorId] = useState(null);
   const [myPapers, setMyPapers] = useState([]);
-  // 假设当前登录作者ID=10
-  const authorId = 10;
 
   useEffect(() => {
+    const storedUserInfo = localStorage.getItem('userInfo');
+    if (!storedUserInfo) {
+      router.push('/login');
+      return;
+    }
+    const user = JSON.parse(storedUserInfo);
+    setAuthorId(user.accountId);
+  }, [router]);
+
+  useEffect(() => {
+    if (!authorId) return;
     fetch(`http://localhost:3000/paper/myPapers?author_id=${authorId}`)
       .then(r => r.json())
       .then(data => {
         if (data.success) {
           setMyPapers(data.papers);
+        } else {
+          console.error('Failed to fetch my papers:', data.message);
         }
       })
-      .catch(err => console.error(err));
-  }, []);
+      .catch(err => console.error('Network error:', err));
+  }, [authorId]);
 
-  const handleInvite = async (paperId) => {
-    try {
-      const res = await fetch('http://localhost:3000/review/invite', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paper_id: paperId })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert(`已成功邀请${data.invitedCount}位评审`);
-      } else {
-        alert(data.message || '邀请失败');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('网络错误');
+  function formatReviewStatus(reviewStatuses) {
+    if (!reviewStatuses) return 'No reviewers yet';
+    const statuses = reviewStatuses.split(',').map(s => s.trim());
+    if (statuses.includes('submitted')) {
+      return `Some reviews are submitted (${reviewStatuses})`;
     }
-  };
+    return `In review (${reviewStatuses})`;
+  }
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>我的个人中心</h1>
-      <h2>我提交的论文</h2>
+      <h1>My Profile</h1>
+      <h2>My Submitted Papers</h2>
+
       {myPapers.map(paper => (
-        <div key={paper.paper_id} style={{ border: '1px solid #ddd', margin: '10px 0', padding: 10 }}>
+        <div key={paper.DID} style={{ border: '1px solid #ddd', margin: '10px 0', padding: 10 }}>
           <h3>{paper.title}</h3>
-          <p>摘要：{paper.abstract}</p>
-          <p>关键词：{paper.keywords}</p>
-          <p>时间：{paper.timestamp}</p>
-          <button onClick={() => handleInvite(paper.paper_id)}>邀请评审</button>
+          <p><strong>Authors:</strong> {paper.authors}</p>
+          <p><strong>Abstract:</strong> {paper.abstract}</p>
+          <p><strong>Keywords:</strong> {paper.keywords}</p>
+          <p><strong>Review Status:</strong> {formatReviewStatus(paper.reviewStatuses)}</p>
+          <p><strong>Time:</strong> {paper.timestamp}</p>
+          <a
+            href={`https://gateway.pinata.cloud/ipfs/${paper.DID}`}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'blue', textDecoration: 'underline' }}
+          >
+            View PDF
+          </a>
         </div>
       ))}
     </div>
