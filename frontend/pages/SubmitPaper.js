@@ -15,14 +15,24 @@ export default function PdfUploadPage() {
   const [selectedKeywords, setSelectedKeywords] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Example keyword list (you can adjust or fetch from backend)
   const keywordOptions = [
+    { value: '3D Reconstruction', label: '3D Reconstruction' },
+    { value: 'AI History', label: 'AI History' },
+    { value: 'AI Optimization', label: 'AI Optimization' },
+    { value: 'AI Planning', label: 'AI Planning' },
+    { value: 'Algorithms', label: 'Algorithms' },
+    { value: 'Analysis', label: 'Analysis' },
     { value: 'Artificial Intelligence', label: 'Artificial Intelligence' },
-    { value: 'Machine Learning', label: 'Machine Learning' },
-    { value: 'Deep Learning', label: 'Deep Learning' },
     { value: 'Computer Vision', label: 'Computer Vision' },
+    { value: 'Data Science', label: 'Data Science' },
+    { value: 'Deep Learning', label: 'Deep Learning' },
+    { value: 'Machine Learning', label: 'Machine Learning' },
+    { value: 'Natural Language Processing', label: 'Natural Language Processing' },
+    { value: 'Neural Networks', label: 'Neural Networks' },
     { value: 'NLP', label: 'NLP' },
-    // ... add more as needed
+    { value: 'Optimization', label: 'Optimization' },
+    { value: 'Robotics', label: 'Robotics' },
+    { value: 'Transformers', label: 'Transformers' }
   ];
 
   const handleKeywordsChange = (selectedOptions) => {
