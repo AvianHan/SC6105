@@ -1,10 +1,11 @@
-// frontend/pages/profile.js
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import styles from '../styles/Form.module.css';
+import { ArrowLeft, FileText, Clock, Tag, Users } from 'lucide-react';
 
 export default function Profile() {
   const router = useRouter();
-
   const [authorId, setAuthorId] = useState(null);
   const [myPapers, setMyPapers] = useState([]);
 
@@ -25,8 +26,6 @@ export default function Profile() {
       .then(data => {
         if (data.success) {
           setMyPapers(data.papers);
-        } else {
-          console.error('Failed to fetch my papers:', data.message);
         }
       })
       .catch(err => console.error('Network error:', err));
@@ -42,28 +41,64 @@ export default function Profile() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>My Profile</h1>
-      <h2>My Submitted Papers</h2>
+    <div className={styles.form}>
+      <Link href="/search" className={styles.backButton}>
+        <ArrowLeft size={24} />
+      </Link>
 
-      {myPapers.map(paper => (
-        <div key={paper.DID} style={{ border: '1px solid #ddd', margin: '10px 0', padding: 10 }}>
-          <h3>{paper.title}</h3>
-          <p><strong>Authors:</strong> {paper.authors}</p>
-          <p><strong>Abstract:</strong> {paper.abstract}</p>
-          <p><strong>Keywords:</strong> {paper.keywords}</p>
-          <p><strong>Review Status:</strong> {formatReviewStatus(paper.reviewStatuses)}</p>
-          <p><strong>Time:</strong> {paper.timestamp}</p>
-          <a
-            href={`https://gateway.pinata.cloud/ipfs/${paper.DID}`}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: 'blue', textDecoration: 'underline' }}
-          >
-            View PDF
-          </a>
-        </div>
-      ))}
+      <h1 className={styles.title}>My Profile</h1>
+      <h2 className={styles.subtitle}>My Submitted Papers</h2>
+
+      <div className={styles.paperList}>
+        {myPapers.length === 0 ? (
+          <p className={styles.noResults}>No papers submitted yet</p>
+        ) : (
+          myPapers.map(paper => (
+            <div key={paper.DID} className={styles.paperCard}>
+              <h3 className={styles.cardTitle}>{paper.title}</h3>
+              
+              <div className={styles.metaInfo}>
+                <div className={styles.metaItem}>
+                  <Users className={styles.metaIcon} />
+                  <span>{paper.authors}</span>
+                </div>
+                
+                <div className={styles.metaItem}>
+                  <Clock className={styles.metaIcon} />
+                  <span>{paper.timestamp}</span>
+                </div>
+
+                <div className={styles.metaItem}>
+                  <Tag className={styles.metaIcon} />
+                  <span>{paper.keywords}</span>
+                </div>
+              </div>
+
+              <div className={styles.abstract}>
+                <h4>Abstract</h4>
+                <p>{paper.abstract}</p>
+              </div>
+
+              <div className={styles.reviewStatus}>
+                <h4>Review Status</h4>
+                <div className={styles.statusBadge}>
+                  {formatReviewStatus(paper.reviewStatuses)}
+                </div>
+              </div>
+
+              <a
+                href={`https://gateway.pinata.cloud/ipfs/${paper.DID}`}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.viewButton}
+              >
+                <FileText className={styles.buttonIcon} />
+                View PDF
+              </a>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }
