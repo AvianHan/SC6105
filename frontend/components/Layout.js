@@ -1,3 +1,5 @@
+// frontend/components/Layout.js
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -10,7 +12,7 @@ export default function Layout({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const router = useRouter();
 
-  // 检查登录状态的函数
+  // Check login status
   const checkLoginStatus = () => {
     const token = localStorage.getItem('token');
     const storedUserInfo = localStorage.getItem('userInfo');
@@ -31,15 +33,13 @@ export default function Layout({ children }) {
   };
 
   useEffect(() => {
-    // 初始检查登录状态
+    // initial check
     checkLoginStatus();
 
-    // 添加登录状态变化的事件监听器
     const handleLoginStateChange = () => {
       checkLoginStatus();
     };
 
-    // 添加存储变化的事件监听器
     const handleStorageChange = (e) => {
       if (e.key === 'token' || e.key === 'userInfo') {
         checkLoginStatus();
@@ -49,7 +49,6 @@ export default function Layout({ children }) {
     window.addEventListener('loginStateChange', handleLoginStateChange);
     window.addEventListener('storage', handleStorageChange);
 
-    // 清理事件监听器
     return () => {
       window.removeEventListener('loginStateChange', handleLoginStateChange);
       window.removeEventListener('storage', handleStorageChange);
@@ -102,20 +101,20 @@ export default function Layout({ children }) {
                 <Link href="/search" className={styles.dropdownItem}>Home</Link>
                 {isLoggedIn ? (
                   <>
-                    {/*当不是作者时不显示Upload Paper选项*/}
                     {userInfo?.author ? (
                       <Link href="/SubmitPaper" className={styles.dropdownItem}>Upload Paper</Link>
                     ) : null}
-                    {/*当不是审稿人时不显示Peer Review选项*/}
                     {userInfo?.reviewer ? (
                       <Link href="/myReviews" className={styles.dropdownItem}>Peer Review</Link>
                     ) : null}
-                    {/*当不是作者时不显示My Papers选项*/}
                     {userInfo?.author ? (
                       <Link href="/profile" className={styles.dropdownItem}>My Papers</Link>
                     ) : null}
                     <div className={styles.dropdownDivider} />
-                    <Link href="/profile" className={styles.dropdownItem}>Account Settings</Link>
+                    {/* key fix: link to /accountSettings */}
+                    <Link href="/accountSettings" className={styles.dropdownItem}>
+                      Account Settings
+                    </Link>
                     <div className={styles.dropdownDivider} />
                     <div className={styles.dropdownItem} onClick={handleSignOut}>
                       Sign out

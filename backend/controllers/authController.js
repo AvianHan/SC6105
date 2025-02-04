@@ -1,3 +1,5 @@
+// backend/controllers/authController.js
+
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const Account = require('../models/account');
@@ -41,7 +43,6 @@ exports.register = async (req, res) => {
   try {
     const { accountId, password, nickname, reviewer, author, field } = req.body;
     
-    // 添加验证：如果是reviewer必须有field
     if (reviewer && !field) {
       return res.status(400).json({ error: '评审者必须选择领域' });
     }
@@ -54,5 +55,56 @@ exports.register = async (req, res) => {
     }
     console.error(err);
     res.status(500).json({ error: '服务器错误' });
+  }
+};
+
+// ============ 新增 ============
+
+/**
+ * updateUser: 更新昵称 / 领域 / 密码 (可选)
+ * 需要先通过 authMiddleware，因此从 req.user 中获得当前登录者 ID
+ * 前端会传 { nickname, field, newPassword }
+ */
+exports.updateUser = async (req, res) => {
+  try {
+    const { nickname, field, newPassword } = req.body;
+
+    // 在 authMiddleware 已解出:
+    //   req.user = { accountId, nickname, reviewer, author, iat, exp }
+    const userInToken = req.user; 
+    if (!userInToken?.accountId) {
+      return res.status(401).json({ success: false, message: '未登录或token无效' });
+    }
+
+    // 先拿数据库里旧信息
+    const oldInfo = await Account.findById(userInToken.accountId);
+    if (!oldInfo) {
+      return res.status(404).json({ success: false, message: '用户不存在' });
+    }
+
+    // 如果用户想改密码，就哈希，否则保留原密码
+    let finalPasswordHash = oldInfo.password;
+    if (newPassword && newPassword.trim()) {
+      finalPasswordHash = await bcrypt.hash(newPassword.trim(), 10);
+    }
+
+    // 调用 update
+    await Account.update(userInToken.accountId, {
+      nickname: nickname || oldInfo.nickname,
+      field: field || oldInfo.field,
+      password: finalPasswordHash
+    });
+
+    return res.json({
+      success: true,
+      message: '更新成功',
+      updated: {
+        nickname: nickname || oldInfo.nickname,
+        field: field || oldInfo.field
+      }
+    });
+  } catch (error) {
+    console.error('updateUser error:', error);
+    res.status(500).json({ success: false, message: '服务器错误', error });
   }
 };

@@ -1,3 +1,5 @@
+// backend/routes/auth.js
+
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
@@ -11,5 +13,9 @@ router.post('/register', authController.register);
 router.get('/verify', authMiddleware, (req, res) => {
   res.json({ user: req.user });
 });
+
+// =========== 新增 ===========
+// 只有登录后才能修改
+router.post('/updateUser', authMiddleware, authController.updateUser);
 
 module.exports = router;
