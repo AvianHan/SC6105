@@ -16,6 +16,6 @@ router.get('/verify', authMiddleware, (req, res) => {
 
 // =========== 新增 ===========
 // 只有登录后才能修改
-router.post('/updateUser', authMiddleware, authController.updateUser);
+router.post('/updateUser', authController.updateUser);
 
 module.exports = router;
