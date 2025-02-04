@@ -291,3 +291,170 @@
   background-color: #eee;
   color: #333;
 }
+
+.tabContainer {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tabButton {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+}
+
+.activeTab {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.paperCard {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.cardTitle {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.cardStatus {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.cardActions {
+  display: flex;
+  gap: 10px;
+}
+
+.buttonIcon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+.acceptButton {
+  background-color: #28a745;
+  color: white;
+}
+
+.acceptButton:hover {
+  background-color: #218838;
+}
+
+.rejectButton {
+  background-color: #dc3545;
+  color: white;
+}
+
+.rejectButton:hover {
+  background-color: #c82333;
+}
+
+.noResults {
+  text-align: center;
+  color: #666;
+  padding: 40px 0;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1.5rem;
+  margin: 20px 0;
+}
+
+.paperList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metaInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  color: #666;
+  font-size: 14px;
+}
+
+.metaIcon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}
+
+.abstract {
+  margin: 16px 0;
+}
+
+.abstract h4 {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.abstract p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.reviewStatus {
+  margin: 16px 0;
+}
+
+.reviewStatus h4 {
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #666;
+}
+
+.viewButton {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.viewButton:hover {
+  background-color: #0056b3;
+  text-decoration: none;
+}
