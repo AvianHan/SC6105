@@ -92,6 +92,9 @@
 }
 
 .backButton {
+  position: absolute;
+  top: 30px;
+  left: 20px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
